@@ -44,20 +44,17 @@ jobs:
 
       - name: Check code formatting with Black
         run: |
-          cd mysite
           black --check --diff --exclude migrations . || echo "::warning::Code formatting issues found. Run 'black .' to fix."
         continue-on-error: true
 
       - name: Check import sorting with isort
         run: |
-          cd mysite
           isort --check-only --diff --skip migrations . || echo "::warning::Import sorting issues found. Run 'isort .' to fix."
         continue-on-error: true
 
       - name: Lint with flake8
         run: |
-          cd mysite
-          flake8 --max-line-length=120 --exclude=migrations,__pycache__,.venv --ignore=E501,W503,W293,E122,E126 .
+          flake8 --max-line-length=120 --exclude=migrations,__pycache__,.venv,venv --ignore=E501,W503,W293,E122,E126 .
 
   # ============================================
   # Run Tests
@@ -144,22 +141,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r mysite/requirements/development.txt
+          pip install -r requirements/development.txt
 
       - name: Run database migrations
         run: |
-          cd mysite
           python manage.py migrate --no-input
 
       - name: Run tests with coverage
         run: |
-          cd mysite
           pytest --cov=apps --cov=services --cov-report=xml --cov-report=term-missing -v
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          file: mysite/coverage.xml
+          file: coverage.xml
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -187,7 +182,7 @@ jobs:
 
       - name: Check for security vulnerabilities
         run: |
-          pip install -r mysite/requirements/base.txt
+          pip install -r requirements/base.txt
           safety check --full-report || true
         continue-on-error: true
 
@@ -209,7 +204,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd mysite
           docker build -t job-tracker-api:${{ github.sha }} .
           docker build -t job-tracker-api:latest .
 
