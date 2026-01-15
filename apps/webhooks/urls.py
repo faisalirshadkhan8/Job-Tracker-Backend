@@ -2,15 +2,16 @@
 Webhook URL Configuration.
 """
 
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
-from .views import WebhookEndpointViewSet, WebhookDeliveryViewSet
+from .views import WebhookDeliveryViewSet, WebhookEndpointViewSet
 
 router = DefaultRouter()
-router.register('endpoints', WebhookEndpointViewSet, basename='webhook-endpoint')
-router.register('deliveries', WebhookDeliveryViewSet, basename='webhook-delivery')
+router.register("endpoints", WebhookEndpointViewSet, basename="webhook-endpoint")
+router.register("deliveries", WebhookDeliveryViewSet, basename="webhook-delivery")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]
