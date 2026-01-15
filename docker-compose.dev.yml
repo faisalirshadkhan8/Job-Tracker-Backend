@@ -1,0 +1,43 @@
+# Docker Compose for LOCAL DEVELOPMENT
+# Use this to run only PostgreSQL and Redis while developing
+# Run: docker-compose -f docker-compose.dev.yml up -d
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: jobtracker_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jobtracker
+      POSTGRES_USER: jobtracker_user
+      POSTGRES_PASSWORD: jobtracker_pass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobtracker_user -d jobtracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: jobtracker_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

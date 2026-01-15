@@ -1,0 +1,32 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Verify Your Email - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h2>Welcome aboard! 👋</h2>
+
+<p>Hi {{ user.first_name|default:user.username }},</p>
+
+<p>Thanks for signing up for <strong>{{ app_name }}</strong>! We're excited to help you organize your job search and land your dream role.</p>
+
+<p>To get started, please verify your email address by clicking the button below:</p>
+
+<div class="button-wrapper">
+    <a href="{{ verification_url }}" class="button">Verify Email Address</a>
+</div>
+
+<div class="info-box">
+    <p>⏱️ This link will expire in <strong>24 hours</strong>. If you need a new link, you can request one from the login page.</p>
+</div>
+
+<hr class="divider">
+
+<p style="font-size: 14px; color: #64748b;">
+    If the button doesn't work, copy and paste this link into your browser:<br>
+    <a href="{{ verification_url }}" style="color: #667eea; word-break: break-all;">{{ verification_url }}</a>
+</p>
+
+<p style="font-size: 14px; color: #94a3b8;">
+    If you didn't create an account, you can safely ignore this email.
+</p>
+{% endblock %}

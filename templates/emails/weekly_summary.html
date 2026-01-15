@@ -1,0 +1,68 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Weekly Summary{% endblock %}
+
+{% block content %}
+<h2>Your Weekly Job Search Summary 📊</h2>
+
+<p>Hi {{ user.first_name|default:user.username }},</p>
+
+<p>Here's a summary of your job search activity this week:</p>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0;">
+    <!-- New Applications -->
+    <div style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 36px; font-weight: 700; color: #fff;">{{ new_applications }}</div>
+        <div style="font-size: 14px; color: rgba(255,255,255,0.9);">New Applications</div>
+    </div>
+    
+    <!-- Status Updates -->
+    <div style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 36px; font-weight: 700; color: #fff;">{{ status_changes }}</div>
+        <div style="font-size: 14px; color: rgba(255,255,255,0.9);">Status Updates</div>
+    </div>
+    
+    <!-- Interviews -->
+    <div style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%); border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 36px; font-weight: 700; color: #fff;">{{ interviews_scheduled }}</div>
+        <div style="font-size: 14px; color: rgba(255,255,255,0.9);">Interviews Scheduled</div>
+    </div>
+</div>
+
+{% if upcoming_interviews > 0 %}
+<div class="info-box" style="background-color: #fef3c7; border-left-color: #f59e0b;">
+    <p style="margin: 0; color: #92400e;">
+        <strong>📅 Heads up!</strong> You have <strong>{{ upcoming_interviews }}</strong> upcoming interview{{ upcoming_interviews|pluralize }} scheduled. Make sure you're prepared!
+    </p>
+</div>
+{% endif %}
+
+<hr class="divider">
+
+<h3 style="color: #1a1a2e;">This Week's Highlights</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+    <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Interviews Completed</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #1a1a2e;">{{ interviews_completed }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; color: #64748b;">Applications Submitted</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #1a1a2e;">{{ new_applications }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 12px 0; color: #64748b;">Response Rate</td>
+        <td style="padding: 12px 0; text-align: right; font-weight: 600; color: #667eea;">Keep going! 💪</td>
+    </tr>
+</table>
+
+<div class="button-wrapper">
+    <a href="{{ frontend_url }}/dashboard" class="button">View Dashboard</a>
+</div>
+
+<hr class="divider">
+
+<p style="text-align: center; color: #64748b; font-size: 14px;">
+    Keep up the great work! Every application brings you closer to your dream job.
+</p>
+{% endblock %}

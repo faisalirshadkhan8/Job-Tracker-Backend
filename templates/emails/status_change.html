@@ -1,0 +1,66 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Application Update{% endblock %}
+
+{% block content %}
+<h2>Application Status Update 📬</h2>
+
+<p>Hi {{ user.first_name|default:user.username }},</p>
+
+<p>Great news! There's an update on your job application:</p>
+
+<div class="info-box" style="background-color: #f8fafc; border-left-color: #667eea; padding: 20px; margin: 24px 0;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Company</td>
+            <td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">{{ company.name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Position</td>
+            <td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">{{ application.job_title }}</td>
+        </tr>
+    </table>
+</div>
+
+<div style="text-align: center; margin: 32px 0;">
+    <div style="display: inline-block; padding: 12px 24px; background-color: #f1f5f9; border-radius: 8px; color: #64748b; font-size: 14px;">
+        {{ old_status_display }}
+    </div>
+    <div style="display: inline-block; padding: 0 16px; color: #667eea; font-size: 24px;">
+        →
+    </div>
+    <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: #fff; font-weight: 600;">
+        {{ new_status_display }}
+    </div>
+</div>
+
+{% if new_status == 'interviewing' %}
+<div class="info-box" style="background-color: #ecfdf5; border-left-color: #10b981;">
+    <p style="margin: 0; color: #065f46;">
+        <strong>🎉 Congratulations!</strong> You've moved to the interview stage. Check your dashboard for scheduling details.
+    </p>
+</div>
+{% elif new_status == 'offer' %}
+<div class="info-box" style="background-color: #fef3c7; border-left-color: #f59e0b;">
+    <p style="margin: 0; color: #92400e;">
+        <strong>🎊 Amazing!</strong> You've received an offer! Take your time to review the details carefully.
+    </p>
+</div>
+{% elif new_status == 'rejected' %}
+<div class="info-box" style="background-color: #f1f5f9; border-left-color: #64748b;">
+    <p style="margin: 0; color: #475569;">
+        Don't be discouraged! Every "no" brings you closer to the right "yes". Keep applying! 💪
+    </p>
+</div>
+{% endif %}
+
+<div class="button-wrapper">
+    <a href="{{ frontend_url }}/applications/{{ application.id }}" class="button">View Application</a>
+</div>
+
+<hr class="divider">
+
+<p style="text-align: center; color: #64748b; font-size: 14px;">
+    You're doing great! Keep tracking your progress.
+</p>
+{% endblock %}

@@ -1,0 +1,156 @@
+# Docker Compose for Job Application Tracker
+# Run: docker-compose up -d
+
+services:
+  # Django Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+    container_name: jobtracker_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - SECURE_SSL_REDIRECT=False
+      - DB_NAME=jobtracker
+      - DB_USER=jobtracker_user
+      - DB_PASSWORD=jobtracker_pass123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - MODEL=${MODEL:-llama-3.3-70b-versatile}
+      - AI_ASYNC_ENABLED=${AI_ASYNC_ENABLED:-true}
+      # 2FA Settings
+      - TWOFA_ISSUER_NAME=${TWOFA_ISSUER_NAME:-JobTracker}
+      # Webhook Settings  
+      - WEBHOOK_TIMEOUT=${WEBHOOK_TIMEOUT:-30}
+      - WEBHOOK_MAX_RETRIES=${WEBHOOK_MAX_RETRIES:-3}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/analytics/live/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Celery Worker for Async AI Tasks
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+    container_name: jobtracker_celery
+    restart: unless-stopped
+    command: celery -A config worker -l info --concurrency=2
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=jobtracker
+      - DB_USER=jobtracker_user
+      - DB_PASSWORD=jobtracker_pass123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - MODEL=${MODEL:-llama-3.3-70b-versatile}
+      # Webhook Settings
+      - WEBHOOK_TIMEOUT=${WEBHOOK_TIMEOUT:-30}
+      - WEBHOOK_MAX_RETRIES=${WEBHOOK_MAX_RETRIES:-3}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "celery", "-A", "config", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # Celery Beat for Scheduled Tasks (notifications, reminders)
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+    container_name: jobtracker_beat
+    restart: unless-stopped
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=jobtracker
+      - DB_USER=jobtracker_user
+      - DB_PASSWORD=jobtracker_pass123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_healthy
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: jobtracker_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jobtracker
+      POSTGRES_USER: jobtracker_user
+      POSTGRES_PASSWORD: jobtracker_pass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobtracker_user -d jobtracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: jobtracker_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

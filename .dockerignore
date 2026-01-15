@@ -1,0 +1,56 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+*.test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local settings
+.env
+.env.*
+!.env.example
+
+# SQLite (we use PostgreSQL)
+db.sqlite3
+
+# Static/Media (collected at build time)
+staticfiles/
+mediafiles/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

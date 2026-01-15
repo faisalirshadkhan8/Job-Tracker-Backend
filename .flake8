@@ -1,0 +1,37 @@
+# Flake8 configuration
+
+[flake8]
+max-line-length = 120
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    migrations,
+    build,
+    dist
+ignore = 
+    # Line too long (handled by black)
+    E501,
+    # Line break before binary operator
+    W503,
+    # Whitespace before ':'
+    E203,
+    # Blank line contains whitespace
+    W293,
+    # Continuation line issues
+    E122,
+    E126,
+    # Missing docstring in public module
+    D100,
+    # Missing docstring in public class
+    D101,
+    # Missing docstring in public method
+    D102,
+    # Missing docstring in public function
+    D103,
+per-file-ignores =
+    # Imported but unused in __init__.py
+    __init__.py: F401
+    # Local variable assigned but never used in tests
+    test_*.py: F841

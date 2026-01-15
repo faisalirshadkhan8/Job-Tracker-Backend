@@ -1,0 +1,60 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Interview Reminder{% endblock %}
+
+{% block content %}
+<h2>Interview Reminder 📅</h2>
+
+<p>Hi {{ user.first_name|default:user.username }},</p>
+
+<p>This is a friendly reminder that you have an upcoming interview:</p>
+
+<div class="info-box" style="background-color: #f0f9ff; border-left-color: #667eea; padding: 20px; margin: 24px 0;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Company</td>
+            <td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">{{ company.name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Position</td>
+            <td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">{{ application.job_title }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Interview Type</td>
+            <td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">{{ interview_type }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Scheduled For</td>
+            <td style="padding: 8px 0; color: #667eea; font-weight: 600;">{{ scheduled_at|date:"l, F j, Y" }} at {{ scheduled_at|time:"g:i A" }}</td>
+        </tr>
+        {% if meeting_link %}
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Meeting Link</td>
+            <td style="padding: 8px 0;"><a href="{{ meeting_link }}" style="color: #667eea;">Join Meeting</a></td>
+        </tr>
+        {% endif %}
+        {% if meeting_location %}
+        <tr>
+            <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Location</td>
+            <td style="padding: 8px 0; color: #1a1a2e;">{{ meeting_location }}</td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+
+<h3 style="color: #1a1a2e; margin-top: 32px;">Tips for Success 💪</h3>
+
+<ul class="feature-list">
+    <li>Review the job description and your resume</li>
+    <li>Research the company's recent news and culture</li>
+    <li>Prepare questions to ask the interviewer</li>
+    <li>Test your equipment if it's a video call</li>
+    <li>Get a good night's sleep!</li>
+</ul>
+
+<hr class="divider">
+
+<p style="text-align: center; color: #64748b; font-size: 14px;">
+    Good luck! You've got this! 🌟
+</p>
+{% endblock %}
