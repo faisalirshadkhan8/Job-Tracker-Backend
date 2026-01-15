@@ -8,7 +8,7 @@ from django.urls import reverse
 
 import pytest
 
-from apps.ai.models import AITask, GeneratedContent
+from apps.ai.models import AITask
 
 
 @pytest.fixture

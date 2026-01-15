@@ -7,7 +7,6 @@ import io
 from datetime import datetime
 
 from django.http import HttpResponse
-from django.template.loader import render_to_string
 
 
 class ExportService:
@@ -320,7 +319,7 @@ APPLICATION SOURCES
             display = dict(applications.model.SOURCE_CHOICES).get(source, source)
             summary += f"  {display}: {count}\n"
 
-        summary += f"""
+        summary += """
 ---
 Exported from Job Application Tracker
 """

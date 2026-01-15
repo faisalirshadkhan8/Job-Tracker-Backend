@@ -6,7 +6,6 @@ Handles sending email reminders and notifications.
 import logging
 from datetime import timedelta
 
-from django.conf import settings
 from django.utils import timezone
 
 from celery import shared_task
@@ -22,7 +21,6 @@ def send_interview_reminders():
     """
     from apps.interviews.models import Interview
     from apps.notifications.models import NotificationLog, NotificationPreference
-    from services.email_service import EmailService
 
     now = timezone.now()
     sent_count = 0
@@ -99,7 +97,6 @@ def send_weekly_summary():
     from apps.applications.models import Application
     from apps.interviews.models import Interview
     from apps.notifications.models import NotificationLog, NotificationPreference
-    from services.email_service import EmailService
 
     now = timezone.now()
     week_ago = now - timedelta(days=7)

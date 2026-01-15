@@ -2,7 +2,6 @@
 Tests for input sanitization.
 """
 
-import pytest
 
 from services.sanitizer import PromptSanitizer
 

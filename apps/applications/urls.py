@@ -2,7 +2,7 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from .views import ApplicationViewSet, NoteViewSet, ResumeVersionViewSet
+from .views import ApplicationViewSet, ResumeVersionViewSet
 
 router = DefaultRouter()
 router.register("", ApplicationViewSet, basename="application")

@@ -54,7 +54,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 --max-line-length=120 --exclude=migrations,__pycache__,.venv,venv --ignore=E501,W503,W293,E122,E126 .
+          flake8 --max-line-length=120 --exclude=migrations,__pycache__,.venv,venv --ignore=E501,W503,W293,E122,E126,F403,F405 .
 
   # ============================================
   # Run Tests

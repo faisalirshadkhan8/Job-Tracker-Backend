@@ -5,7 +5,6 @@ Two-Factor Authentication Service.
 import base64
 import io
 import logging
-import secrets
 from typing import Optional, Tuple
 
 from django.conf import settings

@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from django.db.models import Avg, Count, F, Q
-from django.db.models.functions import TruncMonth, TruncWeek
+from django.db.models import Count, F, Q
+from django.db.models.functions import TruncWeek
 from django.utils import timezone
 
 from rest_framework.permissions import IsAuthenticated

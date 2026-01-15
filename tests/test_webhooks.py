@@ -2,7 +2,6 @@
 Tests for Webhook functionality.
 """
 
-import json
 from unittest.mock import MagicMock, patch
 
 from django.urls import reverse

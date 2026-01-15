@@ -4,12 +4,9 @@ Handles all interactions with Groq API.
 """
 
 import time
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from django.conf import settings
-
-if TYPE_CHECKING:
-    from groq import Groq
 
 try:
     from groq import Groq
@@ -26,7 +23,7 @@ class GroqService:
     _client = None
 
     @classmethod
-    def get_client(cls) -> "Groq | None":
+    def get_client(cls):
         """Get or create Groq client singleton."""
         if Groq is None:
             raise ImportError("groq package is not installed. Run: pip install groq")

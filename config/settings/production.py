@@ -5,6 +5,8 @@ Use environment variables for all sensitive data.
 
 import os
 
+import dj_database_url
+
 from .base import *
 
 # SECURITY: Get secret key from environment
@@ -21,8 +23,6 @@ ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts.split(",") if host.stri
 
 # Database - PostgreSQL for production
 # Railway provides DATABASE_URL, otherwise use individual variables
-import dj_database_url
-
 if os.environ.get("DATABASE_URL"):
     # Railway/Heroku style DATABASE_URL
     DATABASES = {

@@ -2,7 +2,7 @@
 Tests for AI endpoints.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from django.urls import reverse
 

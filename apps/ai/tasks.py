@@ -8,7 +8,6 @@ allowing instant API responses while AI processing continues.
 import json
 import logging
 
-from django.conf import settings
 from django.utils import timezone
 
 from celery import shared_task

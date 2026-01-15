@@ -56,7 +56,7 @@ REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 try:
-    import django_redis
+    pass
 
     CACHES = {
         "default": {
