@@ -4,7 +4,6 @@ Handles resume and document storage.
 """
 
 import re
-from urllib.parse import urlparse
 
 from django.conf import settings
 
@@ -41,10 +40,6 @@ class CloudinaryService:
             Signed URL string
         """
         get_cloudinary_config()
-        
-        import time
-        # Generate signed URL with expiration
-        expires_at = int(time.time()) + 3600  # Valid for 1 hour
         
         signed_url, _ = cloudinary.utils.cloudinary_url(
             public_id,
