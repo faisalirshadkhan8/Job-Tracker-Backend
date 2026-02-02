@@ -62,10 +62,27 @@ class WebhookEndpointCreateSerializer(serializers.ModelSerializer):
     events = serializers.ListField(
         child=serializers.ChoiceField(choices=[e[0] for e in WebhookEndpoint.EVENT_CHOICES]), min_length=1
     )
+    # Accept "description" as an alias for "name" for frontend compatibility
+    description = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = WebhookEndpoint
-        fields = ["name", "url", "events", "is_active"]
+        fields = ["name", "url", "events", "is_active", "description"]
+        extra_kwargs = {
+            "name": {"required": False},
+        }
+
+    def validate(self, attrs):
+        # Allow "description" as an alias for "name"
+        if "description" in attrs and not attrs.get("name"):
+            attrs["name"] = attrs.pop("description")
+        elif "description" in attrs:
+            attrs.pop("description")
+        
+        if not attrs.get("name"):
+            raise serializers.ValidationError({"name": "This field is required."})
+        
+        return attrs
 
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user

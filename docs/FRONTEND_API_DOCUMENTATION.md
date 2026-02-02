@@ -655,6 +655,23 @@ POST /api/v1/applications/resumes/{id}/set-default/
 ```
 **Auth Required**: Yes
 
+**Description:** Mark a specific resume version as your default resume.
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "version_name": "Backend Focus",
+  "file_url": "https://res.cloudinary.com/...",
+  "file_name": "john_doe_backend_resume.pdf",
+  "file_size": 125000,
+  "file_size_display": "122.1 KB",
+  "cloudinary_public_id": "resumes/user_1/...",
+  "is_default": true,
+  "created_at": "2026-01-10T10:00:00Z"
+}
+```
+
 ---
 
 #### Delete Resume
@@ -1122,6 +1139,73 @@ GET /api/v1/ai/tasks/
 ```
 **Auth Required**: Yes
 
+**Response (200 OK):**
+```json
+{
+  "count": 10,
+  "results": [
+    {
+      "id": 456,
+      "task_type": "cover_letter",
+      "task_type_display": "Cover Letter",
+      "status": "completed",
+      "status_display": "Completed",
+      "created_at": "2026-01-16T10:00:00Z",
+      "completed_at": "2026-01-16T10:00:05Z"
+    }
+  ]
+}
+```
+
+---
+
+### Get Pending AI Tasks
+```
+GET /api/v1/ai/tasks/pending/
+```
+**Auth Required**: Yes
+
+**Description:** Returns only tasks with status `pending` or `processing`.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 457,
+    "task_type": "job_match",
+    "task_type_display": "Job Match",
+    "status": "processing",
+    "status_display": "Processing",
+    "created_at": "2026-01-16T10:05:00Z",
+    "started_at": "2026-01-16T10:05:01Z"
+  }
+]
+```
+
+---
+
+### Cancel AI Task
+```
+POST /api/v1/ai/tasks/{id}/cancel/
+```
+**Auth Required**: Yes
+
+**Description:** Cancel a pending AI task. Cannot cancel tasks that are already processing.
+
+**Response (200 OK):**
+```json
+{
+  "status": "cancelled"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Cannot cancel task with status: processing"
+}
+```
+
 ---
 
 ### AI Generation History
@@ -1167,6 +1251,83 @@ PATCH /api/v1/ai/history/{id}/
   "is_favorite": true,
   "rating": 5
 }
+```
+
+---
+
+### Toggle Favorite AI History Item
+```
+POST /api/v1/ai/history/{id}/toggle_favorite/
+```
+**Auth Required**: Yes
+
+**Description:** Toggle the favorite status of a generated content item.
+
+**Response (200 OK):**
+```json
+{
+  "is_favorite": true
+}
+```
+
+---
+
+### Rate AI History Item
+```
+POST /api/v1/ai/history/{id}/rate/
+```
+**Auth Required**: Yes
+
+**Request Body:**
+```json
+{
+  "rating": 5
+}
+```
+
+**Rating Range:** 1-5 stars
+
+**Response (200 OK):**
+```json
+{
+  "rating": 5
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Rating must be between 1 and 5"
+}
+```
+
+---
+
+### Get Favorite AI History Items
+```
+GET /api/v1/ai/history/favorites/
+```
+**Auth Required**: Yes
+
+**Description:** Returns only AI-generated content marked as favorites.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 123,
+    "content_type": "cover_letter",
+    "content_type_display": "Cover Letter",
+    "input_company_name": "Google",
+    "input_job_title": "Senior Software Engineer",
+    "output_content": "Dear Hiring Manager...",
+    "model_used": "llama-3.1-70b-versatile",
+    "tokens_used": 1500,
+    "is_favorite": true,
+    "rating": 5,
+    "created_at": "2026-01-16T10:00:00Z"
+  }
+]
 ```
 
 ---
@@ -1546,6 +1707,23 @@ GET /api/v1/webhooks/deliveries/{id}/
 POST /api/v1/webhooks/deliveries/{id}/retry/
 ```
 **Auth Required**: Yes
+
+**Description:** Manually retry a failed webhook delivery. Cannot retry successful deliveries.
+
+**Response (200 OK):**
+```json
+{
+  "message": "Webhook queued for retry",
+  "delivery_id": "660e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Cannot retry successful delivery"
+}
+```
 
 ---
 
@@ -1936,4 +2114,152 @@ X-Webhook-Signature: sha256=<HMAC-SHA256 of payload using secret>
 
 ---
 
-*Generated on: January 16, 2026*
+## Quick Reference - All Endpoints
+
+### Authentication & User Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register/` | Register new user |
+| POST | `/api/v1/auth/login/` | Login and get JWT tokens |
+| POST | `/api/v1/auth/logout/` | Logout and blacklist token |
+| POST | `/api/v1/auth/token/refresh/` | Refresh access token |
+| POST | `/api/v1/auth/verify-email/` | Verify email with token |
+| POST | `/api/v1/auth/resend-verification/` | Resend verification email |
+| POST | `/api/v1/auth/password-reset/` | Request password reset |
+| POST | `/api/v1/auth/password-reset/confirm/` | Confirm password reset |
+| GET/PUT/PATCH | `/api/v1/auth/profile/` | Get/update user profile |
+| PUT | `/api/v1/auth/change-password/` | Change password |
+
+### Companies
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/companies/` | List all companies |
+| POST | `/api/v1/companies/` | Create new company |
+| GET | `/api/v1/companies/{id}/` | Get company details |
+| PUT/PATCH | `/api/v1/companies/{id}/` | Update company |
+| DELETE | `/api/v1/companies/{id}/` | Delete company |
+
+### Applications
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/applications/` | List all applications |
+| POST | `/api/v1/applications/` | Create new application |
+| GET | `/api/v1/applications/{id}/` | Get application details |
+| PUT/PATCH | `/api/v1/applications/{id}/` | Update application |
+| PATCH | `/api/v1/applications/{id}/status/` | Quick status update |
+| DELETE | `/api/v1/applications/{id}/` | Delete application |
+| GET | `/api/v1/applications/{id}/notes/` | List application notes |
+| POST | `/api/v1/applications/{id}/notes/` | Add note to application |
+
+### Resumes
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/applications/resumes/` | List all resume versions |
+| POST | `/api/v1/applications/resumes/upload/` | Upload new resume |
+| GET | `/api/v1/applications/resumes/{id}/` | Get resume details |
+| POST | `/api/v1/applications/resumes/{id}/set-default/` | Set as default resume |
+| DELETE | `/api/v1/applications/resumes/{id}/` | Delete resume |
+
+### Interviews
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/interviews/` | List all interviews |
+| POST | `/api/v1/interviews/` | Create new interview |
+| GET | `/api/v1/interviews/{id}/` | Get interview details |
+| PUT/PATCH | `/api/v1/interviews/{id}/` | Update interview |
+| PATCH | `/api/v1/interviews/{id}/outcome/` | Update interview outcome |
+| DELETE | `/api/v1/interviews/{id}/` | Delete interview |
+| GET | `/api/v1/interviews/upcoming/` | Get upcoming interviews |
+| GET | `/api/v1/interviews/today/` | Get today's interviews |
+
+### Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/analytics/dashboard/` | Main dashboard statistics |
+| GET | `/api/v1/analytics/response-rate/` | Response rate by source |
+| GET | `/api/v1/analytics/funnel/` | Application status funnel |
+| GET | `/api/v1/analytics/weekly/` | Weekly activity chart |
+| GET | `/api/v1/analytics/top-companies/` | Top companies by apps |
+
+### AI Features
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/ai/cover-letter/generate/` | Generate cover letter |
+| POST | `/api/v1/ai/job-match/analyze/` | Analyze job match score |
+| POST | `/api/v1/ai/interview-questions/generate/` | Generate interview questions |
+
+### AI Tasks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/ai/tasks/` | List all AI tasks |
+| GET | `/api/v1/ai/tasks/{id}/` | Get task status & result |
+| GET | `/api/v1/ai/tasks/pending/` | Get pending/processing tasks |
+| POST | `/api/v1/ai/tasks/{id}/cancel/` | Cancel pending task |
+| DELETE | `/api/v1/ai/tasks/{id}/` | Delete task record |
+
+### AI History
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/ai/history/` | List generation history |
+| GET | `/api/v1/ai/history/{id}/` | Get history item details |
+| GET | `/api/v1/ai/history/favorites/` | Get favorite items only |
+| PATCH | `/api/v1/ai/history/{id}/` | Update favorite/rating |
+| POST | `/api/v1/ai/history/{id}/toggle_favorite/` | Toggle favorite status |
+| POST | `/api/v1/ai/history/{id}/rate/` | Rate generated content |
+| DELETE | `/api/v1/ai/history/{id}/` | Delete history item |
+
+### Notifications
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET/PUT/PATCH | `/api/v1/notifications/preferences/` | Manage notification settings |
+| GET | `/api/v1/notifications/history/` | List notification history |
+| GET | `/api/v1/notifications/history/{id}/` | Get notification details |
+
+### Two-Factor Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/2fa/status/` | Get 2FA status |
+| POST | `/api/v1/2fa/setup/` | Setup 2FA (get QR code) |
+| POST | `/api/v1/2fa/confirm/` | Confirm 2FA setup |
+| POST | `/api/v1/2fa/verify/` | Verify 2FA code |
+| POST | `/api/v1/2fa/disable/` | Disable 2FA |
+| POST | `/api/v1/2fa/backup-codes/regenerate/` | Regenerate backup codes |
+
+### Webhooks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/webhooks/endpoints/` | List webhook endpoints |
+| POST | `/api/v1/webhooks/endpoints/` | Create webhook endpoint |
+| GET | `/api/v1/webhooks/endpoints/{id}/` | Get endpoint details |
+| PUT/PATCH | `/api/v1/webhooks/endpoints/{id}/` | Update endpoint |
+| DELETE | `/api/v1/webhooks/endpoints/{id}/` | Delete endpoint |
+| GET | `/api/v1/webhooks/endpoints/events/` | Get available events |
+| POST | `/api/v1/webhooks/endpoints/{id}/test/` | Test webhook |
+| POST | `/api/v1/webhooks/endpoints/{id}/regenerate_secret/` | Regenerate secret |
+
+### Webhook Deliveries
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/webhooks/deliveries/` | List delivery attempts |
+| GET | `/api/v1/webhooks/deliveries/{id}/` | Get delivery details |
+| POST | `/api/v1/webhooks/deliveries/{id}/retry/` | Retry failed delivery |
+
+### Data Exports
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/exports/applications/` | Export applications CSV |
+| GET | `/api/v1/exports/companies/` | Export companies CSV |
+| GET | `/api/v1/exports/interviews/` | Export interviews CSV |
+| GET | `/api/v1/exports/full-report/` | Export full report ZIP |
+
+### Health Checks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/analytics/health/` | Full health check |
+| GET | `/api/v1/analytics/ready/` | Readiness probe |
+| GET | `/api/v1/analytics/live/` | Liveness probe |
+
+---
+
+*Generated on: January 16, 2026*  
+*Last Updated: February 1, 2026*

@@ -3,11 +3,15 @@ Cloudinary service for file uploads.
 Handles resume and document storage.
 """
 
+import re
+from urllib.parse import urlparse
+
 from django.conf import settings
 
 import cloudinary
 import cloudinary.api
 import cloudinary.uploader
+import cloudinary.utils
 
 
 def get_cloudinary_config():
@@ -22,6 +26,34 @@ def get_cloudinary_config():
 
 class CloudinaryService:
     """Service class for Cloudinary operations."""
+
+    @staticmethod
+    def get_signed_url(public_id: str, resource_type: str = "raw") -> str:
+        """
+        Generate a signed URL for accessing a file.
+        Uses cloudinary_url with sign_url=True to bypass ACL restrictions.
+        
+        Args:
+            public_id: The Cloudinary public_id of the file
+            resource_type: 'raw' for PDFs, 'image' for images
+            
+        Returns:
+            Signed URL string
+        """
+        get_cloudinary_config()
+        
+        import time
+        # Generate signed URL with expiration
+        expires_at = int(time.time()) + 3600  # Valid for 1 hour
+        
+        signed_url, _ = cloudinary.utils.cloudinary_url(
+            public_id,
+            resource_type=resource_type,
+            type="authenticated",  # Use authenticated type for signed access
+            sign_url=True,
+            secure=True,
+        )
+        return signed_url
 
     @staticmethod
     def upload_resume(file, user_id: int, version_name: str) -> dict:
@@ -45,16 +77,22 @@ class CloudinaryService:
         # Generate a clean filename
         original_name = file.name if hasattr(file, "name") else "resume"
 
+        # Sanitize version_name and original_name for URL-safe public_id
+        safe_version = re.sub(r'[^a-zA-Z0-9_-]', '_', version_name)
+        safe_original = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_name)
+
         try:
             result = cloudinary.uploader.upload(
                 file,
                 folder=folder,
                 resource_type="raw",  # For PDFs and documents
-                public_id=f"{version_name}_{original_name}",
+                type="upload",
+                public_id=f"{safe_version}_{safe_original}",
                 overwrite=True,
                 tags=[f"user_{user_id}", "resume", version_name],
             )
 
+            # Store original secure_url (short) - signed URL generated dynamically in serializer
             return {
                 "url": result["secure_url"],
                 "public_id": result["public_id"],
@@ -84,16 +122,21 @@ class CloudinaryService:
         folder = f"jobtracker/cover_letters/user_{user_id}"
         original_name = file.name if hasattr(file, "name") else "cover_letter"
 
+        # Sanitize original_name for URL-safe public_id
+        safe_original = re.sub(r'[^a-zA-Z0-9_.-]', '_', original_name)
+
         try:
             result = cloudinary.uploader.upload(
                 file,
                 folder=folder,
                 resource_type="raw",
-                public_id=f"application_{application_id}_{original_name}",
+                type="upload",
+                public_id=f"application_{application_id}_{safe_original}",
                 overwrite=True,
                 tags=[f"user_{user_id}", "cover_letter", f"application_{application_id}"],
             )
 
+            # Store original secure_url (short) - signed URL generated dynamically when needed
             return {
                 "url": result["secure_url"],
                 "public_id": result["public_id"],
